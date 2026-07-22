@@ -1,0 +1,39 @@
+{
+  "name": "liquid-glass-style",
+  "description": "Premium long-form look: frosted-glass panels, subtle parallax, and gentle ken-burns zoom on the talking head. Used for YouTube long-form (the demo intro style).",
+  "layout": "fullscreen",
+  "safe_area": { "top": 0.06, "bottom": 0.10, "left": 0.06, "right": 0.06 },
+  "card": {
+    "bg": "rgba(21,21,28,0.55)",
+    "backdrop_blur": 24,
+    "border": "1px solid rgba(255,255,255,0.12)",
+    "radius": 24,
+    "shadow": "0 24px 80px rgba(0,0,0,0.5)",
+    "padding": 44,
+    "accent": "{{color.accent}}",
+    "highlight_sheen": true
+  },
+  "type": {
+    "title_font": "{{font.display}}",
+    "title_size": 84,
+    "title_color": "{{color.text}}",
+    "body_font": "{{font.body}}",
+    "body_size": 44,
+    "body_color": "{{color.muted}}"
+  },
+  "logo": { "show": true, "corner": "{{logo.corner}}", "src": "{{logo.mark}}", "opacity": "{{logo.opacity}}" },
+  "zoom": {
+    "enabled": true,
+    "amount": 1.08,
+    "ease": "{{motion.in}}",
+    "note": "Punch-in emphasis on key beats; 'zoom' kind beats have no graphic layer, only camera move."
+  },
+  "animation": {
+    "enter": "glass-rise",
+    "enter_ease": "{{motion.in}}",
+    "enter_dur": 0.55,
+    "exit": "glass-dissolve",
+    "exit_dur": 0.4,
+    "emphasis": "sheen-sweep"
+  }
+}

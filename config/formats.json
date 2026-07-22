@@ -1,0 +1,69 @@
+{
+  "$comment": "The three delivery formats. Per the pipeline, ONLY steps 3 (graphics) and 5 (captions) change between formats; steps 1,2,4,6,7 are identical. `steps` controls which stages run and how.",
+
+  "long-form": {
+    "label": "Long-form — YouTube",
+    "aspect": "16:9",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "graphics": {
+      "default_preset": "liquid-glass-style",
+      "style": "glass + zoom",
+      "layout": "fullscreen",
+      "b_roll": true
+    },
+    "captions": {
+      "enabled": false,
+      "note": "Long-form ships with YouTube CC / no burned-in captions."
+    },
+    "thumbnail": "always",
+    "reframe": false
+  },
+
+  "short-explainer": {
+    "label": "Short — Explainer",
+    "aspect": "9:16",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "graphics": {
+      "default_preset": "signature-style",
+      "style": "top-half cards",
+      "layout": "top-half",
+      "face_region": "bottom-half",
+      "b_roll": false
+    },
+    "captions": {
+      "enabled": true,
+      "preset": "captions-style",
+      "position": "center",
+      "locked": true,
+      "note": "Centered, locked position between top-half graphic and bottom-half face."
+    },
+    "thumbnail": "optional",
+    "reframe": true
+  },
+
+  "short-tiktok": {
+    "label": "Short — TikTok / Raw",
+    "aspect": "9:16",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "graphics": {
+      "default_preset": "tiktok-raw-style",
+      "style": "hook card -> raw",
+      "layout": "hook-then-raw",
+      "b_roll": false
+    },
+    "captions": {
+      "enabled": true,
+      "preset": "tiktok-raw-style",
+      "position": "low",
+      "note": "Low, just under the face; raw punchy look."
+    },
+    "thumbnail": "skip",
+    "reframe": true
+  }
+}

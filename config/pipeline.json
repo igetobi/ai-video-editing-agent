@@ -1,0 +1,41 @@
+{
+  "$comment": "Global pipeline defaults. Per-job overrides live in projects/<job>/job.json.",
+  "rough_cut": {
+    "min_gap": 0.35,
+    "$comment_min_gap": "Silence longer than this (seconds) between words is a cut candidate.",
+    "keep_pad": 0.08,
+    "$comment_keep_pad": "Lead/tail padding (s) kept around each retained span so cuts don't clip consonants.",
+    "merge_gap": 0.12,
+    "$comment_merge_gap": "Adjacent kept spans closer than this are merged into one segment.",
+    "min_segment": 0.20,
+    "$comment_min_segment": "Drop kept spans shorter than this (usually breaths/clicks).",
+    "drop_low_score": 0.35,
+    "$comment_drop_low_score": "Words below this WhisperX confidence are treated as likely noise.",
+    "filler_words": [
+      "um", "uh", "erm", "hmm", "mmm", "like", "you know", "i mean",
+      "sort of", "kind of", "basically", "literally", "actually", "so yeah",
+      "right", "okay so", "and so"
+    ],
+    "$comment_filler": "Filler removal is CONSERVATIVE by default — only standalone hesitations (um/uh/erm) are cut automatically. Discourse fillers (like/actually/basically) are flagged in the EDL note for review, not auto-cut, to avoid mangling meaning.",
+    "aggressive_filler": false,
+    "audio_target_lufs": -16.0
+  },
+  "graphics": {
+    "engine": "hyperframes",
+    "beats_per_minute_target": 8,
+    "$comment_bpm": "Rough density target the planner aims for on long-form; short-form is denser.",
+    "segment_codec": "prores_ks_alpha",
+    "$comment_codec": "Per-beat overlays render with alpha (ProRes 4444 / .mov) so they composite cleanly.",
+    "render_concurrency": 2
+  },
+  "music": {
+    "default_gain_db": -23.0,
+    "duck_threshold": 0.05,
+    "duck_ratio": 8
+  },
+  "export": {
+    "also_copy_to_downloads": true,
+    "downloads_dir": "~/Downloads",
+    "container": "mp4"
+  }
+}

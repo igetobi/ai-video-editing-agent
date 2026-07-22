@@ -1,0 +1,45 @@
+# --- Job working data: keep the structure & the example, ignore real media/state ---
+projects/*
+!projects/.gitkeep
+!projects/_example/
+projects/_example/raw/*
+!projects/_example/raw/.gitkeep
+
+# Media & renders anywhere
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.aac
+*.m4a
+# ...but keep tiny fixtures used by tests
+!tests/fixtures/**
+
+# Brand assets are user-supplied; keep the READMEs / .gitkeeps only
+assets/fonts/*
+assets/logos/*
+assets/mascots/*
+assets/music/*
+!assets/**/README.md
+!assets/**/.gitkeep
+
+# --- Node / HyperFrames ---
+node_modules/
+.hyperframes/
+skills/.cache/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

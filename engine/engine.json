@@ -1,0 +1,19 @@
+{
+  "$comment": "Configuration for the vendored HyperFrames engine. This is the ONE place to adjust the render invocation for your installed HyperFrames version. Do not hand-edit generated compositions — regenerate them from graphics/plan.json instead. Verify flags with `npx hyperframes render --help`.",
+  "engine": "hyperframes",
+  "render": {
+    "command": ["npx", "hyperframes", "render"],
+    "input_flag": "--input",
+    "output_flag": "--output",
+    "extra_args": ["--transparent", "--fps", "{fps}"],
+    "$comment_extra": "{fps} and {width}/{height} are substituted at call time. --transparent yields an alpha overlay (ProRes 4444 .mov) so beats composite over the footage. Drop --transparent for full-frame renders.",
+    "output_ext": ".mov"
+  },
+  "preview": {
+    "command": ["npx", "hyperframes", "preview"]
+  },
+  "lint": {
+    "command": ["npx", "hyperframes", "lint"]
+  },
+  "fallback_full_frame_ext": ".mp4"
+}

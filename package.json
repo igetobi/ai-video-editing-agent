@@ -1,0 +1,18 @@
+{
+  "name": "ai-video-editing-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Claude-driven, end-to-end video editing pipeline built on the HyperFrames HTML video engine.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "doctor": "bash scripts/doctor.sh",
+    "engine:install": "npx skills add heygen-com/hyperframes --full-depth && npx hyperframes skills update",
+    "engine:preview": "npx hyperframes preview",
+    "engine:lint": "npx hyperframes lint"
+  },
+  "dependencies": {
+    "hyperframes": "^1"
+  }
+}

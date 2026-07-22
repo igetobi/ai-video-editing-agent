@@ -1,0 +1,36 @@
+{
+  "$comment": "Pins the vendored HyperFrames engine + agent skills. Treat like a lockfile: update via `npm run engine:install` (npx skills add heygen-com/hyperframes --full-depth), never hand-edit compositions or engine internals. This records what the pipeline was built/tested against.",
+  "registry": "heygen-com/hyperframes",
+  "install": "npx skills add heygen-com/hyperframes --full-depth",
+  "update": "npx hyperframes skills update",
+  "engine": {
+    "package": "hyperframes",
+    "range": "^1",
+    "node": ">=22",
+    "requires": ["ffmpeg"]
+  },
+  "toolkit": {
+    "$comment": "The HyperFrames capabilities this pipeline relies on, mapped to the diagram's engine box.",
+    "reframe": "aspect-ratio reframing (16:9 <-> 9:16) — used for short-form delivery",
+    "graphics": "HTML/CSS card + motion compositions (lower-thirds, top cards, callouts, lists, stats)",
+    "b-roll": "image/video cutaway overlays",
+    "motion": "seek-safe CSS/GSAP keyframe animation",
+    "captions": "HyperFrames embedded-captions skill (we also ship a fast ASS caption path)"
+  },
+  "skills": {
+    "core": [
+      "hyperframes",
+      "hyperframes-core",
+      "hyperframes-animation",
+      "hyperframes-keyframes",
+      "hyperframes-cli",
+      "media-use"
+    ],
+    "creation": [
+      "embedded-captions",
+      "talking-head-recut",
+      "motion-graphics",
+      "general-video"
+    ]
+  }
+}

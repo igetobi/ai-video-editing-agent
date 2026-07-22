@@ -1,0 +1,31 @@
+{
+  "name": "signature-style",
+  "description": "Clean top-half explainer cards for short-form explainer videos. Graphic sits in the top half, face in the bottom half, captions centered between.",
+  "layout": "top-half",
+  "safe_area": { "top": 0.04, "bottom": 0.52, "left": 0.06, "right": 0.06 },
+  "card": {
+    "bg": "{{color.surface}}",
+    "border": "1px solid rgba(255,255,255,0.08)",
+    "radius": 28,
+    "shadow": "0 20px 60px rgba(0,0,0,0.45)",
+    "padding": 40,
+    "accent": "{{color.accent}}"
+  },
+  "type": {
+    "title_font": "{{font.display}}",
+    "title_size": 64,
+    "title_color": "{{color.text}}",
+    "body_font": "{{font.body}}",
+    "body_size": 40,
+    "body_color": "{{color.muted}}"
+  },
+  "logo": { "show": true, "corner": "{{logo.corner}}", "src": "{{logo.mark}}", "opacity": "{{logo.opacity}}" },
+  "animation": {
+    "enter": "slide-up-fade",
+    "enter_ease": "{{motion.in}}",
+    "enter_dur": "{{motion.in_dur}}",
+    "exit": "fade",
+    "exit_dur": "{{motion.out_dur}}",
+    "emphasis": "none"
+  }
+}

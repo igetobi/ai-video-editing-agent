@@ -1,0 +1,27 @@
+{
+  "name": "captions-style",
+  "description": "The signature burned-in caption look for short-form explainer: a black rounded box behind the words, each word animating in on-beat as it is spoken. Uses word-level WhisperX timings — no re-transcription.",
+  "position": "center",
+  "max_lines": 2,
+  "max_chars_per_line": 22,
+  "font": "{{font.caption}}",
+  "size": 72,
+  "weight": 700,
+  "color": "{{color.caption_text}}",
+  "highlight_color": "{{color.caption_highlight}}",
+  "box": {
+    "enabled": true,
+    "color": "{{color.caption_box}}",
+    "opacity": 0.85,
+    "radius": 14,
+    "padding_x": 22,
+    "padding_y": 12
+  },
+  "stroke": { "enabled": false, "width": 0, "color": "#000000" },
+  "shadow": "0 4px 18px rgba(0,0,0,0.6)",
+  "all_caps": false,
+  "per_word": true,
+  "animate_in": "rise-fade",
+  "highlight_mode": "active-word",
+  "$comment_highlight_mode": "active-word = the currently-spoken word is tinted with highlight_color (karaoke). Set to 'none' for static white."
+}

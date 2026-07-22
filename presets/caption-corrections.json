@@ -1,0 +1,23 @@
+{
+  "$comment": "Upstream brand & spelling fixes applied to the transcript BEFORE it becomes the on-screen script or captions. Whole-word, case-insensitive. Extend freely with your product names, people, and commonly-misheard terms.",
+  "replace": {
+    "hyperframes": "HyperFrames",
+    "hyper frames": "HyperFrames",
+    "clod": "Claude",
+    "cloud": "Claude",
+    "claud": "Claude",
+    "anthropic": "Anthropic",
+    "whisperx": "WhisperX",
+    "whisper x": "WhisperX",
+    "ffmpeg": "FFmpeg",
+    "youtube": "YouTube",
+    "tiktok": "TikTok",
+    "premiere": "Premiere",
+    "coolvetica": "Coolvetica"
+  },
+  "regex": [
+    { "pattern": "\\bai\\b", "replace": "AI", "flags": "i" },
+    { "pattern": "\\bapi\\b", "replace": "API", "flags": "i" },
+    { "pattern": "\\bui\\b", "replace": "UI", "flags": "i" }
+  ]
+}

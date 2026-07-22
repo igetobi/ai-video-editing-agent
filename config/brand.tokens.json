@@ -1,0 +1,42 @@
+{
+  "$comment": "Single source of truth for identity. Change values here and every preset + graphic rebrands. Style presets reference these as {{token.path}}.",
+  "brand": {
+    "name": "Your Brand",
+    "handle": "@yourbrand"
+  },
+  "color": {
+    "bg": "#0B0B0F",
+    "surface": "#15151C",
+    "text": "#FFFFFF",
+    "muted": "#A0A0AE",
+    "accent": "#E07A3F",
+    "accent2": "#4C8BF5",
+    "success": "#3FB950",
+    "caption_box": "#000000",
+    "caption_text": "#FFFFFF",
+    "caption_highlight": "#E07A3F"
+  },
+  "font": {
+    "display": "Coolvetica, 'Arial Black', sans-serif",
+    "body": "Inter, -apple-system, 'Helvetica Neue', sans-serif",
+    "caption": "Coolvetica, 'Arial Black', sans-serif",
+    "display_url": "assets/fonts/Coolvetica.otf",
+    "caption_url": "assets/fonts/Coolvetica.otf"
+  },
+  "logo": {
+    "mark": "assets/logos/logo-mark.png",
+    "wordmark": "assets/logos/logo-wordmark.png",
+    "corner": "br",
+    "opacity": 0.9
+  },
+  "mascot": {
+    "image": "assets/mascots/mascot.png",
+    "$comment": "Optional character PNG used by some presets (e.g. the bouncing/glowing card in the demo)."
+  },
+  "motion": {
+    "in": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "out": "cubic-bezier(0.7, 0, 0.84, 0)",
+    "in_dur": 0.45,
+    "out_dur": 0.3
+  }
+}

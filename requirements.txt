@@ -1,0 +1,16 @@
+# Python deps for the pipeline.
+#
+# The pipeline scripts themselves use only the standard library, so the core runs
+# with a bare Python 3.10+. WhisperX (transcription) is the one heavy dependency and
+# is best installed in isolation:
+#
+#   pipx install whisperx           # recommended (isolated CLI)
+#   # or:  pip install whisperx
+#
+# WhisperX pulls in torch/faster-whisper; on Apple Silicon CPU it works out of the
+# box, and CUDA is used automatically if available. See docs/SETUP.md.
+
+whisperx>=3.1.1
+
+# Dev / test only:
+pytest>=7.0

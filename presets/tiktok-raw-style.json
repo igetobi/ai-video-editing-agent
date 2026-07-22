@@ -1,0 +1,31 @@
+{
+  "name": "tiktok-raw-style",
+  "description": "Raw, punchy TikTok look: a bold full-bleed text hook at the top for the first beat, then mostly raw footage with low, high-energy captions just under the face.",
+  "layout": "hook-then-raw",
+  "safe_area": { "top": 0.10, "bottom": 0.14, "left": 0.05, "right": 0.05 },
+  "hook": {
+    "position": "upper-third",
+    "font": "{{font.display}}",
+    "size": 92,
+    "color": "{{color.text}}",
+    "stroke": "6px #000000",
+    "bg": "none",
+    "all_caps": true,
+    "enter": "pop-scale",
+    "enter_dur": 0.25
+  },
+  "captions": {
+    "position": "low",
+    "font": "{{font.caption}}",
+    "size": 78,
+    "color": "{{color.caption_text}}",
+    "highlight": "{{color.caption_highlight}}",
+    "box": "none",
+    "stroke": "6px #000000",
+    "all_caps": true,
+    "per_word": true,
+    "animate_in": "pop"
+  },
+  "logo": { "show": false },
+  "animation": { "emphasis": "shake-on-beat" }
+}
