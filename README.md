@@ -40,12 +40,22 @@ WhisperX word-level transcription.
 
 ## Quickstart
 
+**Option A — Docker (zero install, recommended):** one image with ffmpeg, Node/
+HyperFrames, Chrome, and whisper.cpp baked in. See [docs/DOCKER.md](docs/DOCKER.md).
+Deploy the same image to Railway with [docs/RAILWAY.md](docs/RAILWAY.md).
+
 ```bash
-# 0. One-time: install the engine + tools (see docs/SETUP.md)
-npm install                       # HyperFrames
-npm run engine:install            # HyperFrames agent skills
-pipx install whisperx             # transcription  (or: pip install whisperx)
-brew install ffmpeg               # macOS; see SETUP.md for Linux/Windows
+docker build -t vea .
+docker run --rm -it -v "$PWD/projects:/app/projects" -v "$HOME/Movies:/footage" vea
+```
+
+**Option B — native install:**
+
+```bash
+# 0. One-time (see docs/SETUP.md)
+npm install                       # HyperFrames engine
+npx hyperframes browser ensure    # Chrome Headless Shell (for rendering)
+brew install ffmpeg whisper-cpp   # macOS; ffmpeg + light transcription (no PyTorch)
 bash scripts/doctor.sh            # verify everything
 
 # 1. Then just talk to Claude Code in this folder:
@@ -96,7 +106,9 @@ tests/       unit tests for the pure logic (cutting, captions, edl export, plann
 
 ## Docs
 
-- **[docs/SETUP.md](docs/SETUP.md)** — install WhisperX, FFmpeg, Node/HyperFrames.
+- **[docs/SETUP.md](docs/SETUP.md)** — native install (FFmpeg, Node/HyperFrames, transcription).
+- **[docs/DOCKER.md](docs/DOCKER.md)** — run everything in one all-deps container.
+- **[docs/RAILWAY.md](docs/RAILWAY.md)** — deploy that container to Railway.
 - **[docs/PIPELINE.md](docs/PIPELINE.md)** — every stage in depth.
 - **[docs/FORMATS.md](docs/FORMATS.md)** — the three formats and how to add one.
 - **[docs/PROMPTING.md](docs/PROMPTING.md)** — natural-language editing cheatsheet.
@@ -104,5 +116,6 @@ tests/       unit tests for the pure logic (cutting, captions, edl export, plann
 
 ## Requirements
 
-Python 3.10+, Node 22+, FFmpeg, WhisperX. See `docs/SETUP.md`. Run `bash
-scripts/doctor.sh` to check.
+Node 22+, FFmpeg, and a transcription engine (whisper.cpp — light, no PyTorch — or
+WhisperX). Python 3.10+ (stdlib only). Rendering uses HyperFrames + Chrome Headless
+Shell. Or skip all of it with Docker. Run `bash scripts/doctor.sh` to check.

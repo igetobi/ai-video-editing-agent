@@ -21,9 +21,23 @@ bottom", "add captions", "export it"). You run the stages, show results, and ite
    The engine is pinned in `skills-lock.json`; update it via `npm run engine:install`.
 5. **Ask before destructive or slow-and-irreversible actions** (deleting a job,
    `prune.sh` on unfinished work, re-cutting after graphics exist).
-6. **Report honestly.** If ffmpeg/whisperx/hyperframes isn't installed, say so and
-   point to `scripts/doctor.sh`. Show real durations and paths. Don't claim a render
-   happened if it didn't.
+6. **Report honestly.** If ffmpeg/whisper/hyperframes/Chrome isn't installed, say so
+   and point to `scripts/doctor.sh` (or suggest the Docker image, `docs/DOCKER.md`).
+   Show real durations and paths. Don't claim a render happened if it didn't.
+
+## Transcription engine
+
+Stage 2 transcription supports two engines (`transcribe.py --engine`):
+`hyperframes` (whisper.cpp — light, no PyTorch; default when WhisperX is absent) and
+`whisperx` (heavier, accurate). `--engine auto` picks whichever is installed. Either
+produces the word-level timing everything downstream depends on.
+
+## Running the whole thing in Docker
+
+`docs/DOCKER.md` describes an all-deps image (ffmpeg + Node/HyperFrames + Chrome +
+whisper.cpp). Prefer it when the user hasn't installed the toolchain, or wants to run
+on Railway (`docs/RAILWAY.md`). Rendering needs Chrome Headless Shell —
+`npx hyperframes browser ensure` (baked into the image).
 
 ## The pipeline (same 7 steps, every job)
 

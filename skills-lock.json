@@ -5,9 +5,12 @@
   "update": "npx hyperframes skills update",
   "engine": {
     "package": "hyperframes",
-    "range": "^1",
+    "range": "^0.7.68",
+    "tested_with": "0.7.68",
     "node": ">=22",
-    "requires": ["ffmpeg"]
+    "requires": ["ffmpeg", "chrome-headless-shell"],
+    "chrome": "npx hyperframes browser ensure",
+    "transcription": "whisper.cpp (bundled path via `hyperframes transcribe`) — no PyTorch"
   },
   "toolkit": {
     "$comment": "The HyperFrames capabilities this pipeline relies on, mapped to the diagram's engine box.",

@@ -1,0 +1,22 @@
+.git
+node_modules
+projects/*
+!projects/.gitkeep
+!projects/_example
+**/__pycache__
+*.pyc
+.pytest_cache
+.venv
+venv
+# Large media never belongs in the image
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.wav
+*.mp3
+assets/fonts/*
+assets/logos/*
+assets/mascots/*
+assets/music/*
+!assets/**/README.md

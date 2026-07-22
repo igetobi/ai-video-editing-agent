@@ -1,7 +1,24 @@
 # Setup
 
-Five things: Python, FFmpeg, Node 22+, the HyperFrames engine, and WhisperX. Run
-`bash scripts/doctor.sh` at any point to see what's missing.
+> **Zero-install option:** don't want to install any of this? Run everything in the
+> all-dependencies Docker image instead — see [DOCKER.md](DOCKER.md). The rest of this
+> page is the native (no-Docker) setup.
+
+Four things: FFmpeg, Node 22+, the HyperFrames engine, and a transcription engine.
+Python 3.10+ (standard library only) rounds it out. Run `bash scripts/doctor.sh` at
+any point to see what's missing.
+
+## Transcription: pick one engine
+
+- **whisper.cpp (recommended — light, no PyTorch):** used by
+  `transcribe.py --engine hyperframes` via HyperFrames' bundled ASR.
+  - macOS: `brew install whisper-cpp`
+  - Linux: build from source (`git clone https://github.com/ggml-org/whisper.cpp &&
+    cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build && cmake --install build`)
+- **WhisperX (optional — accurate, heavier, pulls in PyTorch):** `pipx install whisperx`
+  then `transcribe.py --engine whisperx`.
+
+`transcribe.py` defaults to `--engine auto` (whisperx if present, else whisper.cpp).
 
 ## 1. FFmpeg (video/audio muscle)
 
@@ -32,24 +49,20 @@ generated compositions or engine internals.
 > First render will download the HyperFrames headless-Chrome renderer if it isn't
 > cached. That's expected.
 
-## 3. WhisperX (word-level transcription)
+## 3. WhisperX (optional — only if you chose it above)
 
-WhisperX gives us **word-level timestamps**, which is what makes precise cutting and
-on-beat captions possible.
+WhisperX is the heavier, high-accuracy transcription engine. Skip this if you're using
+whisper.cpp (the default light path).
 
 ```bash
-pipx install whisperx          # recommended — isolated CLI
-# or, into a venv:
-python3 -m venv .venv && source .venv/bin/activate && pip install whisperx
+pipx install whisperx          # isolated CLI
 ```
 
 Notes:
 - WhisperX pulls in PyTorch + faster-whisper. On Apple Silicon it runs on CPU out of
   the box; on an NVIDIA GPU it uses CUDA automatically.
-- First run downloads the model (`large-v3` by default; override with
-  `transcribe.py --model`). `base`/`small` are much faster if you don't need accuracy.
-- Some setups need a HuggingFace token only for speaker **diarization** — we don't use
-  diarization, so it's not required here.
+- Run with `transcribe.py --engine whisperx`. First run downloads the model
+  (`large-v3` by default; `--model base`/`small` are faster).
 
 ## 4. Python
 

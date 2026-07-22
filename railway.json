@@ -1,0 +1,13 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "$comment": "Railway builds this repo from the Dockerfile. This is a batch/interactive tool, not a web server — see docs/RAILWAY.md for how to actually drive it (Railway shell / one-off commands) and why a persistent Volume + object storage matter (containers are ephemeral).",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "bash -lc 'scripts/doctor.sh; echo; echo \"Container ready. Open the Railway shell and run the pipeline (see docs/RAILWAY.md).\"; tail -f /dev/null'",
+    "restartPolicyType": "ON_FAILURE",
+    "numReplicas": 1
+  }
+}

@@ -13,6 +13,6 @@
     "engine:lint": "npx hyperframes lint"
   },
   "dependencies": {
-    "hyperframes": "^1"
+    "hyperframes": "^0.7.68"
   }
 }

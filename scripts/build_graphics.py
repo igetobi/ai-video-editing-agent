@@ -34,8 +34,12 @@ CAMERA_KINDS = {"zoom", "transition"}
 def _render_beats(job: project.Job, plan: Plan, only: set[str] | None, dry_run: bool):
     cache = RenderCache(job.render_cache)
     fingerprints: dict[str, str] = {}
+    graphics_dir = job.path("graphics")
     seg_dir = job.path("graphics", "segments")
     rendered, skipped = [], []
+
+    if not dry_run:
+        hyperframes_adapter.ensure_project(graphics_dir, job.name)
 
     for beat in plan.active():
         if only and beat.id not in only:
@@ -57,7 +61,7 @@ def _render_beats(job: project.Job, plan: Plan, only: set[str] | None, dry_run: 
         if not dry_run:
             html_path.parent.mkdir(parents=True, exist_ok=True)
             html_path.write_text(html)
-        hyperframes_adapter.render(html_path, seg_file, plan.fps, plan.width, plan.height, dry_run=dry_run)
+        hyperframes_adapter.render_beat(graphics_dir, beat.id, seg_file, plan.fps, dry_run=dry_run)
         if not dry_run:
             cache.record(beat.id, h, seg_file)
         rendered.append(beat.id)

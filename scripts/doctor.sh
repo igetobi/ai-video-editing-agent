@@ -24,9 +24,14 @@ else red "node missing  ->  install Node 22+ (nvm install 22)"; fi
 if command -v npx     >/dev/null; then green "npx present"; else red "npx missing (ships with node)"; fi
 
 echo
-echo "Transcription:"
-if command -v whisperx >/dev/null; then green "whisperx present";
-else yellow "whisperx missing  ->  pipx install whisperx   (or: pip install whisperx)"; fi
+echo "Transcription (need ONE engine):"
+if command -v whisper-cli >/dev/null || command -v whisper-cpp >/dev/null; then
+  green "whisper.cpp present (HyperFrames engine — light, no PyTorch)"
+else
+  yellow "whisper.cpp missing  ->  macOS: brew install whisper-cpp  (used by 'transcribe.py --engine hyperframes')"
+fi
+if command -v whisperx >/dev/null; then green "whisperx present (optional; heavier)";
+else yellow "whisperx missing (optional)  ->  pipx install whisperx  (only if you prefer it over whisper.cpp)"; fi
 
 echo
 echo "Engine (HyperFrames):"
@@ -46,6 +51,7 @@ echo
 echo "Summary: $ok ok, $warn warnings, $fail blocking"
 if [[ "$fail" -gt 0 ]]; then
   echo "Fix the ✗ items above, then re-run. See docs/SETUP.md."
+  echo "Prefer zero setup? Run everything in the all-deps container: see docs/DOCKER.md."
   exit 1
 fi
 echo "You're ready. Start with:  python3 scripts/intake.py --source <clip> --name <title> --format <fmt>"

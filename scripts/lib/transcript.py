@@ -44,6 +44,39 @@ class Transcript:
     @classmethod
     def from_whisperx(cls, path: Path) -> "Transcript":
         data = json.loads(Path(path).read_text())
+        return cls._from_segments(data)
+
+    @classmethod
+    def from_any(cls, path: Path) -> "Transcript":
+        """Tolerant loader for transcript JSON from different engines.
+
+        Handles: WhisperX-style {segments:[{words}]}, flat {words:[...]}, a bare word
+        list, and common envelopes ({transcript|result|data: {...}}). Used for the
+        HyperFrames (whisper.cpp) transcribe path, whose exact schema can vary by
+        version — normalize whatever is produced into our Word model.
+        """
+        data = json.loads(Path(path).read_text())
+        for key in ("transcript", "result", "data", "output"):
+            if isinstance(data, dict) and isinstance(data.get(key), dict):
+                data = data[key]
+        if isinstance(data, list):
+            data = {"words": data}
+        if isinstance(data, dict) and data.get("segments"):
+            return cls._from_segments(data)
+        if isinstance(data, dict) and data.get("words"):
+            words = [
+                Word(text=str(w.get("word", w.get("text", ""))).strip(),
+                     start=float(w.get("start", 0.0)),
+                     end=float(w.get("end", w.get("start", 0.0))),
+                     score=float(w.get("score", w.get("probability", 1.0))))
+                for w in data["words"]
+            ]
+            words = [w for w in words if w.text]
+            return cls(words=words, language=data.get("language", "en"))
+        raise ValueError(f"Unrecognized transcript JSON shape in {path}")
+
+    @classmethod
+    def _from_segments(cls, data: dict) -> "Transcript":
         words: list[Word] = []
         segments = data.get("segments") or []
         for seg in segments:

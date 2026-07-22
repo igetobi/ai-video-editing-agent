@@ -1,19 +1,33 @@
 {
-  "$comment": "Configuration for the vendored HyperFrames engine. This is the ONE place to adjust the render invocation for your installed HyperFrames version. Do not hand-edit generated compositions — regenerate them from graphics/plan.json instead. Verify flags with `npx hyperframes render --help`.",
+  "$comment": "Configuration for the HyperFrames engine, matched to the real CLI (hyperframes render, verified against v0.7.68). Adjust here if your installed version changes. Verify with `npx hyperframes render --help`. Do NOT hand-edit generated compositions — regenerate them from graphics/plan.json.",
   "engine": "hyperframes",
+  "package": "hyperframes",
   "render": {
-    "command": ["npx", "hyperframes", "render"],
-    "input_flag": "--input",
-    "output_flag": "--output",
-    "extra_args": ["--transparent", "--fps", "{fps}"],
-    "$comment_extra": "{fps} and {width}/{height} are substituted at call time. --transparent yields an alpha overlay (ProRes 4444 .mov) so beats composite over the footage. Drop --transparent for full-frame renders.",
-    "output_ext": ".mov"
+    "command": ["npx", "--no-install", "hyperframes", "render"],
+    "$comment_shape": "Real usage: hyperframes render <PROJECT_DIR> -c compositions/<beat>.html -o <out> --format mov -f <fps>. The project dir is a positional arg; the composition is referenced relative to it.",
+    "composition_flag": "-c",
+    "output_flag": "-o",
+    "format_flag": "--format",
+    "fps_flag": "-f",
+    "quality_flag": "-q",
+    "quality": "high",
+    "format": "mov",
+    "$comment_format": "mov = ProRes 4444 with alpha; webm = VP9 with alpha. Both composite over footage. mov is the most compatible with ffmpeg overlay.",
+    "extra_args": ["--quiet"]
   },
-  "preview": {
-    "command": ["npx", "hyperframes", "preview"]
+  "browser": {
+    "$comment": "Chrome Headless Shell is required for local rendering; this installs/caches it.",
+    "ensure": ["npx", "--no-install", "hyperframes", "browser", "ensure"]
   },
-  "lint": {
-    "command": ["npx", "hyperframes", "lint"]
+  "transcribe": {
+    "command": ["npx", "--no-install", "hyperframes", "transcribe"],
+    "$comment": "Bundled word-level transcription (whisper.cpp / Parakeet). Preferred over a separate WhisperX install; writes into the project dir.",
+    "dir_flag": "-d",
+    "json_flag": "--json",
+    "model_flag": "-m",
+    "default_model": "small.en"
   },
-  "fallback_full_frame_ext": ".mp4"
+  "preview": { "command": ["npx", "--no-install", "hyperframes", "preview"] },
+  "lint": { "command": ["npx", "--no-install", "hyperframes", "lint"] },
+  "doctor": { "command": ["npx", "--no-install", "hyperframes", "doctor"] }
 }

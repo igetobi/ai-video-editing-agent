@@ -1,0 +1,32 @@
+# Local, interactive use of the all-deps image.
+#
+#   docker compose build
+#   docker compose run --rm editor          # drops you into a shell with everything ready
+#
+# Inside the shell:
+#   bash scripts/doctor.sh
+#   python3 scripts/intake.py --source /footage/clip.mov --name "intro" --format long-form
+#   ... run the pipeline; outputs land in ./projects and ./exports on your host.
+services:
+  editor:
+    build:
+      context: .
+      args:
+        INSTALL_WHISPER: "1"
+        BAKE_CHROME: "1"
+        INSTALL_WHISPERX: "0"
+    image: ai-video-editing-agent
+    stdin_open: true
+    tty: true
+    volumes:
+      # Job data + your brand assets persist on the host.
+      - ./projects:/app/projects
+      - ./assets:/app/assets
+      # Point this at wherever your raw footage lives.
+      - ${FOOTAGE_DIR:-./footage}:/footage
+      # Exported finals show up here on the host.
+      - ./exports:/app/exports
+    environment:
+      HYPERFRAMES_SKIP_SKILLS: "1"
+    working_dir: /app
+    command: ["bash"]

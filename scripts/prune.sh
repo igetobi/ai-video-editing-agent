@@ -30,7 +30,7 @@ fi
 
 # Intermediates (relative to a job dir) that are cheap to regenerate.
 INTERMEDIATES=(
-  "transcript/_whisperx"
+  "transcript/_asr"
   "cut/_segments"
   "cut/_concat.txt"
   "cut/_joined.mp4"
