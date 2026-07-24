@@ -59,6 +59,38 @@ class TestCutting(unittest.TestCase):
         self.assertEqual(seg.word_start, 0)
         self.assertEqual(seg.word_end, 3)
 
+    def test_excludes_drop_phrase(self):
+        t = make_transcript([
+            ("keep", 0.0, 0.3), ("this", 0.32, 0.5),
+            ("bad", 2.0, 2.3), ("take", 2.32, 2.6),      # separate span (gap)
+            ("keep", 4.0, 4.3), ("that", 4.32, 4.6),     # separate span
+        ])
+        edl = build_edl(t, source="raw/x.mp4", cfg=CFG, fps=30, excludes=["bad take"])
+        joined = " ".join(s.text for s in edl.segments).lower()
+        self.assertNotIn("bad take", joined)
+        self.assertIn("keep this", joined)
+        rep = edl.meta["excludes"]
+        self.assertTrue(rep[0]["matched"])
+        self.assertEqual(rep[0]["removed"], 2)
+
+    def test_excludes_time_range(self):
+        t = make_transcript([("a", 0.0, 0.3), ("b", 2.0, 2.3), ("c", 4.0, 4.3)])
+        edl = build_edl(t, source="raw/x.mp4", cfg=CFG, fps=30,
+                        excludes=[{"start": 1.5, "end": 2.5}])
+        joined = " ".join(s.text for s in edl.segments).lower().split()
+        self.assertNotIn("b", joined)
+
+    def test_midpoint_padding_no_overlap(self):
+        # Two spans with a 0.5s gap; large keep_pad would overlap without clamping.
+        t = make_transcript([("one", 0.0, 0.5), ("two", 1.0, 1.5)])
+        cfg = {**CFG, "keep_pad": 0.4, "min_gap": 0.3}
+        edl = build_edl(t, source="raw/x.mp4", cfg=cfg, fps=30)
+        # merge_gap default 0.12; midpoints are 0.75/0.75 so spans stay separated by
+        # the midpoint and never overlap.
+        segs = sorted(edl.segments, key=lambda s: s.src_in)
+        for a, b in zip(segs, segs[1:]):
+            self.assertLessEqual(a.src_out, b.src_in + 1e-6)
+
 
 if __name__ == "__main__":
     unittest.main()

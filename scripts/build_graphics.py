@@ -80,19 +80,45 @@ def _zoom_expr(zoom_beats, factor_default=1.08) -> str:
     return expr
 
 
+def _even(n: float) -> int:
+    return int(n) // 2 * 2
+
+
+def _hexcolor(h: str) -> str:
+    return "0x" + h.lstrip("#")
+
+
 def _composite(job: project.Job, plan: Plan, dry_run: bool):
     base = job.rough_mp4
     if not base.is_file() and not dry_run:
         raise RuntimeError("cut/rough.mp4 missing — run rough_cut first.")
 
-    overlays = [b for b in plan.active() if b.kind not in CAMERA_KINDS]
-    zooms = [b for b in plan.beats if b.enabled and b.kind == "zoom"]
+    fmt = presets.load_format(job.format)
+    layout = fmt.get("layout", "overlay")
+    bg = _hexcolor(fmt.get("bg", "#000000"))
     W, H = plan.width, plan.height
 
-    inputs = ["ffmpeg", "-y", "-i", str(base)]
+    overlays = [b for b in plan.active() if b.kind not in CAMERA_KINDS]
+    zooms = [b for b in plan.beats if b.enabled and b.kind == "zoom"]
     seg_dir = job.path("graphics", "segments")
+
+    inputs = ["ffmpeg", "-y", "-i", str(base)]
     filters = []
-    if zooms:
+    next_idx = 1
+
+    if layout == "composite":
+        # Reframe the face into video_rect on a solid bg canvas (true split layout).
+        x, y, w, h = fmt.get("video_rect", [0, 0, 1, 1])
+        rw, rh = _even(w * W), _even(h * H)
+        rx, ry = _even(x * W), _even(y * H)
+        inputs += ["-f", "lavfi", "-i", f"color=c={bg}:s={W}x{H}:r={plan.fps}"]
+        bg_idx = next_idx
+        next_idx += 1
+        filters.append(
+            f"[0:v]scale={rw}:{rh}:force_original_aspect_ratio=increase,crop={rw}:{rh},setsar=1[face]"
+        )
+        filters.append(f"[{bg_idx}:v][face]overlay={rx}:{ry}:shortest=1[base]")
+    elif zooms:
         z = _zoom_expr(zooms)
         crop = (f"crop=w='iw/({z})':h='ih/({z})':"
                 f"x='(iw-iw/({z}))/2':y='(ih-ih/({z}))/2'")
@@ -101,12 +127,14 @@ def _composite(job: project.Job, plan: Plan, dry_run: bool):
         filters.append("[0:v]setsar=1[base]")
 
     prev = "base"
-    for i, b in enumerate(overlays, start=1):
+    for b in overlays:
+        idx = next_idx
+        next_idx += 1
         inputs += ["-i", str(seg_dir / f"{b.id}.mov")]
-        filters.append(f"[{i}:v]setpts=PTS-STARTPTS+{b.t_in:.3f}/TB[ov{i}]")
-        step = f"c{i}"
+        filters.append(f"[{idx}:v]setpts=PTS-STARTPTS+{b.t_in:.3f}/TB[ov{idx}]")
+        step = f"c{idx}"
         filters.append(
-            f"[{prev}][ov{i}]overlay=0:0:enable='between(t,{b.t_in:.3f},{b.t_out:.3f})':eof_action=pass[{step}]"
+            f"[{prev}][ov{idx}]overlay=0:0:enable='between(t,{b.t_in:.3f},{b.t_out:.3f})':eof_action=pass[{step}]"
         )
         prev = step
 
@@ -116,17 +144,17 @@ def _composite(job: project.Job, plan: Plan, dry_run: bool):
         *ffmpeg.X264, "-c:a", "copy", str(job.composited_mp4),
     ]
     ffmpeg.run(cmd, dry_run=dry_run)
-    return len(overlays), len(zooms)
+    return len(overlays), len(zooms), layout
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Render beats + composite graphics.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     ap.add_argument("--only", nargs="*", help="Restrict rendering to these beat ids (still composites all).")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     if not job.plan_json.is_file():
         print("error: no plan.json — run plan_graphics.py first.", file=sys.stderr)
         return 1
@@ -137,10 +165,10 @@ def main() -> int:
     if rendered:
         print("  rendered:", ", ".join(rendered[:12]) + (" ..." if len(rendered) > 12 else ""))
 
-    n_ov, n_zoom = _composite(job, plan, args.dry_run)
+    n_ov, n_zoom, layout = _composite(job, plan, args.dry_run)
     if not args.dry_run:
-        job.set_stage("graphics", "done", overlays=n_ov, zooms=n_zoom)
-        print(f"✓ composited {n_ov} overlays + {n_zoom} zooms -> {job.composited_mp4}")
+        job.set_stage("graphics", "done", overlays=n_ov, zooms=n_zoom, layout=layout)
+        print(f"✓ composited [{layout}] {n_ov} overlays + {n_zoom} zooms -> {job.composited_mp4}")
         print("  second pass: tweak plan.json + re-run (only changed beats re-render).")
     return 0
 

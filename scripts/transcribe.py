@@ -68,14 +68,14 @@ def run_hyperframes(audio: Path, out_dir: Path, model: str, language: str, dry_r
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Transcribe the raw clip to word-level timestamps.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     ap.add_argument("--engine", default="auto", choices=["auto", "hyperframes", "whisperx"])
     ap.add_argument("--model", default="", help="ASR model (default: engine-specific — small.en / large-v3).")
     ap.add_argument("--language", default="en")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     audio = job.directory / job.source
     if not audio.is_file():
         print(f"error: raw source missing: {audio}", file=sys.stderr)

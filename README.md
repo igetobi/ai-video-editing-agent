@@ -24,8 +24,14 @@ WhisperX word-level transcription.
 - **The edit is data, not a black box.** The cut lives in `edl.json` and the graphics
   in `plan.json` — human- and agent-readable JSON. Change the JSON, re-render. Every
   edit is precise and reversible.
-- **Word-level precision.** WhisperX word timestamps mean "you cut a hair too close to
+- **Word-level precision.** Word-level timestamps mean "you cut a hair too close to
   that word" is an exact operation, not a guess.
+- **Smooth cuts.** Every seam is cross-dissolved (video) and crossfaded (audio), so
+  talking-head jumps read smooth instead of hard — `--hard-cuts` to opt out.
+- **Bad-take list.** Drop restarts/flubs by listing them in `cut/excludes.json`
+  (by phrase, `from → to`, or time range) and re-running — reversible, no manual EDL surgery.
+- **True reframe layouts.** Short-explainer really reframes the face into the bottom
+  half (not just an overlay); each format defines its `video_rect`/`graphic_zone`.
 - **Incremental re-rendering.** Each graphic beat has a content hash; editing one card
   re-renders **one card**, not the whole video. The second-pass loop is fast.
 - **Conservative by default.** It removes silence and clear hesitations (um/uh) but

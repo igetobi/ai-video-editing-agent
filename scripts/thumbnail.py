@@ -20,13 +20,13 @@ from scripts.lib import ffmpeg, presets, project  # noqa: E402
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Generate a thumbnail.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     ap.add_argument("--time", type=float, default=1.0, help="Timestamp (s) of the hero frame.")
     ap.add_argument("--title", help="Optional overlay title.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     base = job.latest_video() or (job.directory / job.source)
     if not Path(base).is_file() and not args.dry_run:
         print(f"error: no source video for thumbnail: {base}", file=sys.stderr)

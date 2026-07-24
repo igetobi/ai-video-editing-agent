@@ -23,11 +23,11 @@ from scripts.lib.transcript import Transcript  # noqa: E402
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Scaffold the graphics plan.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     ap.add_argument("--force", action="store_true", help="Overwrite an existing plan.json.")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     if job.plan_json.is_file() and not args.force:
         print(f"plan already exists: {job.plan_json} (use --force to regenerate)")
         return 0

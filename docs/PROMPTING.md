@@ -12,12 +12,14 @@ what actually changes.
 | "cut the filler too" | re-run `rough_cut.py --aggressive` (cuts like/basically/actually) |
 | "you cut a little too close to 'Claude'" | find that segment, lower its `src_in` ~0.1–0.2s (more lead) |
 | "there's an extra word at the end of that line" | lower that segment's `src_out`, or split it |
-| "leave that stumble/retake out" | delete the segment(s) covering it |
-| "put that sentence back in" | add a segment spanning the raw range you want |
+| "leave that stumble/retake out" | add it to `cut/excludes.json` (phrase, `from→to`, or time range) and re-run rough-cut — reversible |
+| "cut every time I said 'let me restart'" | add each as an excludes entry; re-run |
+| "put that sentence back in" | remove it from excludes / add a segment spanning the raw range |
+| "make the cuts smoother / harder" | smooth cross-dissolves are on by default; `rough_cut.py --hard-cuts` for hard cuts (tune `render.transition_sec`) |
 | "the audio is uneven" | it's loudness-normalized; adjust `audio_target_lufs` if needed |
 
-After any cut change, re-render: `python scripts/apply_cuts.py --job "<job>"`. If
-graphics already exist, retime affected beats (their `t_in`/`t_out`).
+After any cut change, re-render: `python scripts/apply_cuts.py` (—`--job` defaults to
+your newest project). If graphics already exist, retime affected beats (`t_in`/`t_out`).
 
 ## Graphics (edits `graphics/plan.json`, then `build_graphics.py --only <ids>`)
 

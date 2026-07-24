@@ -78,9 +78,13 @@ after stage 2, to finish by hand.
 ## How to drive it
 
 - Check readiness once per environment: `bash scripts/doctor.sh`.
-- Every script takes `--job "<name>"` and supports `--dry-run` (prints the exact
-  ffmpeg/engine commands without running them) — use dry-run to preview or when a
-  tool is missing.
+- Every script takes an optional `--job "<name>"` (defaults to the **newest** project)
+  and supports `--dry-run` (prints the exact ffmpeg/engine commands without running
+  them) — use dry-run to preview or when a tool is missing.
+- Cuts are **cross-dissolved** by default (`--hard-cuts` to disable). Drop bad takes via
+  `cut/excludes.json` (phrase / `from→to` / time range), then re-run rough-cut.
+- Short-explainer uses a **composite reframe** layout (face reframed into the bottom
+  half); long-form/tiktok use **overlay**. Rects live in `config/formats.json`.
 - Report progress with `python scripts/status.py --job "<name>"`.
 - Full per-stage guidance is in each skill under `skills/` and in `docs/PIPELINE.md`.
   Natural-language editing patterns ("cut too close to that word", "move it down",

@@ -7,6 +7,11 @@
     "width": 1920,
     "height": 1080,
     "fps": 30,
+    "layout": "overlay",
+    "bg": "#0b0b0d",
+    "$comment_rects": "video_rect and graphic_zone are normalized [x,y,w,h] of the canvas. overlay = face fills frame, graphics float over it. composite = face is reframed into video_rect on the bg (true split).",
+    "video_rect": [0, 0, 1, 1],
+    "graphic_zone": [0.06, 0.58, 0.46, 0.36],
     "graphics": {
       "default_preset": "liquid-glass-style",
       "style": "glass + zoom",
@@ -27,6 +32,10 @@
     "width": 1080,
     "height": 1920,
     "fps": 30,
+    "layout": "composite",
+    "bg": "#0b0b0d",
+    "video_rect": [0.0, 0.5, 1.0, 0.5],
+    "graphic_zone": [0.06, 0.06, 0.88, 0.40],
     "graphics": {
       "default_preset": "signature-style",
       "style": "top-half cards",
@@ -51,6 +60,10 @@
     "width": 1080,
     "height": 1920,
     "fps": 30,
+    "layout": "overlay",
+    "bg": "#000000",
+    "video_rect": [0, 0, 1, 1],
+    "graphic_zone": [0.08, 0.10, 0.84, 0.22],
     "graphics": {
       "default_preset": "tiktok-raw-style",
       "style": "hook card -> raw",

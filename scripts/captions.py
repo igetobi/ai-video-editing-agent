@@ -32,14 +32,14 @@ def timeline_caption_words(job: project.Job) -> list[Word]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Burn animated captions into the video.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     ap.add_argument("--position", help="Override caption position (low|center|top|0..1).")
     ap.add_argument("--preset", help="Override the caption preset name.")
     ap.add_argument("--force", action="store_true", help="Caption even if the format disables it.")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     fmt = presets.load_format(job.format)
     cap_cfg = fmt.get("captions", {})
     if not cap_cfg.get("enabled", False) and not args.force:

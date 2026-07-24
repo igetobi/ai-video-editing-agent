@@ -107,6 +107,72 @@ def concat_demux(list_file: Path, dst: Path, reencode: bool = False) -> list[str
     return cmd
 
 
+def _fit_filter(w: int, h: int, fit: str = "cover") -> str:
+    """Scale+crop ('cover') or scale+pad ('contain') to WxH with square pixels."""
+    if not w or not h:
+        return "setsar=1"
+    if fit == "contain":
+        return (f"scale={w}:{h}:force_original_aspect_ratio=decrease,"
+                f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1")
+    return f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1"
+
+
+def trim_concat(
+    src: Path, spans: list[tuple[float, float]], dst: Path, fps: float,
+    width: int = 0, height: int = 0, fit: str = "cover", has_audio: bool = True,
+) -> list[str]:
+    """Single-pass, frame-accurate trim of source spans concatenated into one clip.
+
+    Uses trim/atrim filters (not -ss seeking) so cuts land exactly on the
+    word-level timestamps. Hard cuts (no blending).
+    """
+    scale = ("," + _fit_filter(width, height, fit)) if (width and height) else ",setsar=1"
+    vf, af = [], []
+    for i, (a, b) in enumerate(spans):
+        vf.append(f"[0:v]trim=start={a:.3f}:end={b:.3f},setpts=PTS-STARTPTS,fps={fps}{scale}[v{i}]")
+        if has_audio:
+            af.append(f"[0:a]atrim=start={a:.3f}:end={b:.3f},asetpts=PTS-STARTPTS[a{i}]")
+    n = len(spans)
+    if has_audio:
+        pairs = "".join(f"[v{i}][a{i}]" for i in range(n))
+        concat = f"{pairs}concat=n={n}:v=1:a=1[outv][outa]"
+        maps = ["-map", "[outv]", "-map", "[outa]"]
+    else:
+        vs = "".join(f"[v{i}]" for i in range(n))
+        concat = f"{vs}concat=n={n}:v=1:a=0[outv]"
+        maps = ["-map", "[outv]"]
+    filt = ";".join(vf + af + [concat])
+    return ["ffmpeg", "-y", "-i", str(src), "-filter_complex", filt, *maps, "-r", str(fps), *X264, *AAC, str(dst)]
+
+
+def trim_concat_smooth(
+    src: Path, spans: list[tuple[float, float]], dst: Path, fps: float,
+    transition: float = 0.13, width: int = 0, height: int = 0, fit: str = "cover",
+) -> list[str]:
+    """Like trim_concat, but cross-dissolves (video) + crossfades (audio) each seam.
+
+    The per-join transition is clamped to 45% of the shorter neighbouring segment so
+    short segments never break the xfade chain. Talking-head cuts read as smooth
+    instead of hard jumps.
+    """
+    scale = ("," + _fit_filter(width, height, fit)) if (width and height) else ",setsar=1"
+    durs = [b - a for a, b in spans]
+    parts = []
+    for i, (a, b) in enumerate(spans):
+        parts.append(f"[0:v]trim=start={a:.3f}:end={b:.3f},setpts=PTS-STARTPTS,fps={fps}{scale},format=yuv420p,settb=AVTB[v{i}]")
+        parts.append(f"[0:a]atrim=start={a:.3f}:end={b:.3f},asetpts=PTS-STARTPTS,aformat=sample_rates=48000:channel_layouts=stereo[a{i}]")
+    vcur, acur, vlen = "v0", "a0", durs[0]
+    for i in range(1, len(spans)):
+        t = max(0.04, min(transition, 0.45 * min(durs[i - 1], durs[i])))
+        off = max(0.0, vlen - t)
+        parts.append(f"[{vcur}][v{i}]xfade=transition=fade:duration={t:.3f}:offset={off:.3f}[vx{i}]")
+        parts.append(f"[{acur}][a{i}]acrossfade=d={t:.3f}[ax{i}]")
+        vcur, acur = f"vx{i}", f"ax{i}"
+        vlen = vlen + durs[i] - t
+    return ["ffmpeg", "-y", "-i", str(src), "-filter_complex", ";".join(parts),
+            "-map", f"[{vcur}]", "-map", f"[{acur}]", "-r", str(fps), *X264, *AAC, str(dst)]
+
+
 def loudnorm(src: Path, dst: Path, i: float = -16.0, tp: float = -1.5, lra: float = 11.0) -> list[str]:
     """EBU R128 loudness normalization (voice)."""
     return [
@@ -140,17 +206,19 @@ def burn_subtitles(src: Path, ass: Path, dst: Path, fonts_dir: Optional[Path] = 
 def add_music_ducked(
     voice_video: Path, music: Path, dst: Path,
     music_gain_db: float = -23.0, duck_threshold: float = 0.05,
+    duck_ratio: float = 8.0, final_lufs: float = -14.0,
 ) -> list[str]:
     """Mix background music under the voice, side-chain ducking under speech.
 
     ``music_gain_db`` sets the resting music level; ducking pulls it down further
-    whenever the voice is present, then the mix is re-normalized.
+    whenever the voice is present, then the whole mix is re-normalized to
+    ``final_lufs`` (three-stage loudness: voice -16, bed ducked, final -14).
     """
     filt = (
         f"[1:a]volume={music_gain_db}dB[bg];"
-        f"[bg][0:a]sidechaincompress=threshold={duck_threshold}:ratio=8:attack=20:release=400[duck];"
-        f"[0:a][duck]amix=inputs=2:duration=first:dropout_transition=0,"
-        f"loudnorm=I=-16:TP=-1.5:LRA=11[a]"
+        f"[bg][0:a]sidechaincompress=threshold={duck_threshold}:ratio={duck_ratio}:attack=20:release=400[duck];"
+        f"[0:a][duck]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,"
+        f"loudnorm=I={final_lufs}:TP=-1.5:LRA=11[a]"
     )
     return [
         "ffmpeg", "-y", "-i", str(voice_video), "-stream_loop", "-1", "-i", str(music),

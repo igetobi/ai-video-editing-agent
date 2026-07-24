@@ -20,6 +20,13 @@
     "aggressive_filler": false,
     "audio_target_lufs": -16.0
   },
+  "render": {
+    "smooth_cuts": true,
+    "$comment_smooth": "Cross-dissolve (video) + crossfade (audio) at every cut seam so talking-head jumps read smooth. Disable with rough_cut.py --hard-cuts.",
+    "transition_sec": 0.13,
+    "crf": 18,
+    "x264_preset": "medium"
+  },
   "graphics": {
     "engine": "hyperframes",
     "beats_per_minute_target": 8,
@@ -30,6 +37,9 @@
   },
   "music": {
     "default_gain_db": -23.0,
+    "$comment_levels": "Three-stage loudness: voice normalized to -16 LUFS, music bed ducked to ~-23 under speech, final mix to -14 LUFS.",
+    "music_under_voice_lufs": -23.0,
+    "final_lufs": -14.0,
     "duck_threshold": 0.05,
     "duck_ratio": 8
   },

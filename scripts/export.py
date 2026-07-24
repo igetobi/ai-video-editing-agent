@@ -22,12 +22,12 @@ from scripts.lib import ffmpeg, presets, project  # noqa: E402
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Promote the final render.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     ap.add_argument("--to-downloads", action="store_true", help="Force-copy to Downloads.")
     ap.add_argument("--no-downloads", action="store_true", help="Skip the Downloads copy.")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     latest = job.latest_video()
     if latest is None:
         print("error: nothing rendered yet.", file=sys.stderr)

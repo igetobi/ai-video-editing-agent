@@ -76,6 +76,15 @@ def projects_dir() -> Path:
     return repo_root() / "projects"
 
 
+def load_job(name: Optional[str] = None) -> "Job":
+    """Load a job by name, or the newest job when name is omitted.
+
+    Lets every stage CLI accept an optional --job that defaults to the project you
+    most recently touched (matches the reference tool's ergonomics).
+    """
+    return Job.load(name) if name else Job.newest()
+
+
 def slugify(name: str) -> str:
     """Turn an arbitrary title into a filesystem-safe job slug."""
     name = name.strip().lower()
@@ -144,6 +153,15 @@ class Job:
         if p.is_dir():
             return p.resolve()
         return (projects_dir() / slugify(name_or_dir)).resolve()
+
+    @classmethod
+    def newest(cls) -> "Job":
+        """Load the most-recently-updated job (so --job can default to it)."""
+        jobs = [d for d in projects_dir().glob("*/") if (d / "job.json").is_file()]
+        if not jobs:
+            raise FileNotFoundError("No jobs yet. Run intake.py first.")
+        newest = max(jobs, key=lambda d: (d / "job.json").stat().st_mtime)
+        return cls.load(str(newest))
 
     # ---- persistence --------------------------------------------------
     def mkdirs(self) -> None:

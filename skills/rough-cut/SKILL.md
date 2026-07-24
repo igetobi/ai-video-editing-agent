@@ -19,16 +19,33 @@ timing is what makes every downstream edit precise.
 ## 2. Cut
 
 ```
-python scripts/rough_cut.py --job "<job>"          # builds edl.json + renders rough.mp4
-python scripts/rough_cut.py --job "<job>" --aggressive   # also cut like/basically/actually
+python scripts/rough_cut.py               # --job defaults to the newest project
+python scripts/rough_cut.py --aggressive  # also cut like/basically/actually
+python scripts/rough_cut.py --hard-cuts   # disable seam cross-dissolves
 ```
 - Silence longer than `min_gap` and hesitations (um/uh/erm) are removed automatically.
 - Discourse fillers are **flagged in the EDL note**, not auto-cut (avoids mangling
   meaning). Use `--aggressive` to cut them too.
-- Thresholds live in `config/pipeline.json → rough_cut`.
+- Padding is clamped to the midpoint of each gap so cuts never overlap or re-add filler.
+- Seams are **cross-dissolved** by default (smooth talking-head cuts); `--hard-cuts` for hard.
+- A human-readable `cut/script.txt` is written alongside `edl.json`.
+- Thresholds live in `config/pipeline.json → rough_cut` / `render`.
 
 Report the before/after duration and how many segments were flagged. Offer to play
 `cut/rough.mp4`.
+
+## Bad takes / restarts — `cut/excludes.json`
+
+For flubs and restarts, don't hand-surgery the EDL — list them in
+`projects/<job>/cut/excludes.json` and re-run rough-cut. It's reversible (delete the
+entry, re-run). Entry forms:
+```json
+["um so let me start over",
+ {"from": "okay wait", "to": "take two"},
+ {"start": 42.0, "end": 47.5}]
+```
+Each is matched against the transcript and the matching words are dropped from the cut.
+The run reports which entries matched.
 
 ## Fixing cuts (natural language → precise EDL edits)
 

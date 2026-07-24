@@ -21,12 +21,15 @@ are the foundation for everything downstream.
   exceeds it (a pause), the span closes → silence is dropped automatically.
 - Hesitations (um/uh/erm) are removed as words. Discourse fillers (like/basically) are
   **flagged in each segment's note**, not auto-cut (use `--aggressive` to cut them).
-- Kept spans get a little lead/tail padding so cuts don't clip consonants; near-adjacent
-  spans merge for smoother audio.
+- Padding is clamped to each gap's midpoint so cuts never overlap or re-add filler.
+- `cut/excludes.json` drops bad takes/restarts (phrase, `from → to`, or time range),
+  re-runnably. A human-readable `cut/script.txt` is written too.
 
-Then it renders `cut/rough.mp4` (frame-accurate segment extraction → concat →
-loudness normalize). Edit `edl.json` and re-render with `apply_cuts.py` — no
-re-analysis. **Lock the rough cut before graphics** (beats are timed to it).
+Then it renders `cut/rough.mp4` in a single frame-accurate pass (trim/atrim filters,
+not `-ss`), **cross-dissolving each seam** (video xfade + audio acrossfade, tunable via
+`render.transition_sec`; `--hard-cuts` to disable) and loudness-normalizing the voice.
+Edit `edl.json` and re-render with `apply_cuts.py` — no re-analysis. **Lock the rough
+cut before graphics** (beats are timed to it).
 
 ## 3 · Graphics — `plan_graphics.py` → `build_graphics.py` *(format-specific)*
 
@@ -36,9 +39,15 @@ hook-card, callout, list, quote, stat, b-roll, logo-bug, zoom, transition) + cop
 `preset`. The `graphics-plan` skill rewrites the copy/kinds/assets to be *good*.
 
 `build_graphics.py` turns each beat into a HyperFrames composition (`engine/`), renders
-it, and composites overlays (+ ken-burns `zoom` beats) onto the cut →
-`graphics/composited.mp4`. **Incremental:** a per-beat content hash
-(`graphics/.render-cache.json`) means only changed beats re-render.
+it to an alpha MOV, and composites onto the cut → `graphics/composited.mp4`. The
+compositing depends on the format's `layout`:
+- **overlay** (long-form, tiktok) — face fills the frame; graphics float over it; ken-burns
+  `zoom` beats punch into the face.
+- **composite** (short-explainer) — the face is **reframed into `video_rect`** on the
+  format `bg` (a true top/bottom split), graphics sit in `graphic_zone`.
+
+**Incremental:** a per-beat content hash (`graphics/.render-cache.json`) means only
+changed beats re-render.
 
 ## 4 · Second pass — `build_graphics.py --only <ids>` *(manual, with you)*
 

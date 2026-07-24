@@ -22,13 +22,13 @@ from scripts.lib import ffmpeg, presets, project  # noqa: E402
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Add ducked background music.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     ap.add_argument("--music", required=True, help="Path to the music file.")
     ap.add_argument("--gain", type=float, help="Resting music level in dB (default from pipeline.json).")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     music = Path(args.music).expanduser()
     if not music.is_file():
         print(f"error: music not found: {music}", file=sys.stderr)
@@ -49,7 +49,9 @@ def main() -> int:
     ffmpeg.run(
         ffmpeg.add_music_ducked(base, music, job.scored_mp4,
                                 music_gain_db=gain,
-                                duck_threshold=float(cfg.get("duck_threshold", 0.05))),
+                                duck_threshold=float(cfg.get("duck_threshold", 0.05)),
+                                duck_ratio=float(cfg.get("duck_ratio", 8)),
+                                final_lufs=float(cfg.get("final_lufs", -14.0))),
         dry_run=args.dry_run,
     )
     if not args.dry_run:

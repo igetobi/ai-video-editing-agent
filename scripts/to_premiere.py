@@ -23,10 +23,10 @@ from scripts.lib.nle_export import build_cmx3600_edl, build_fcpxml  # noqa: E402
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Export the cut for Premiere/Resolve/FCP.")
-    ap.add_argument("--job", required=True)
+    ap.add_argument("--job")
     args = ap.parse_args()
 
-    job = project.Job.load(args.job)
+    job = project.load_job(args.job)
     if not job.edl_json.is_file():
         print("error: no edl.json — run rough_cut.py first.", file=sys.stderr)
         return 1
